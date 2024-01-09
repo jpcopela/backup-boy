@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #unmounts the external storage device, the camera is already unmounted
-$MNTPT=$1
+MNTPT=$1
 umount $MNTPT
 
 while [ $? -ne 0 ]; do
@@ -10,4 +10,4 @@ while [ $? -ne 0 ]; do
 done
 
 #kill the device NOT FOR TESTING
-sudo halt -p
+#sudo halt -p

@@ -45,7 +45,7 @@ def main():
     backup_config = subprocess.run(['bash', 'backup_config.sh', device_name, mount_point], capture_output=True, text=True)
 
     #Run the prepare_mtb.sh script
-    prepare_mtb = subprocess.run(['bash', 'prepare_mtb.sh'], capture_output=True, text=True)
+    prepare_mtp = subprocess.run(['bash', 'prepare_mtp.sh'], capture_output=True, text=True)
 
     #Get a list of the files to be backed up as a table
     file_list = subprocess.run(['gphoto2', '--list-files'], capture_output=True, text=True)
@@ -102,7 +102,6 @@ def main():
     #change the title of the table to include the number of files
     if (num_files == 0.0):
         console.print("There are no files to be backed up.", style="success")
-        exit()
     elif (num_files / total_files < 0.33):
         console.print(f"There are {num_files} files to be backed up.", style="success")
     elif (num_files / total_files < 0.66):
