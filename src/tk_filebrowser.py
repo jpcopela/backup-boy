@@ -9,11 +9,6 @@ class TKFileBrowser(tk.Frame):
     def __init__(self, root : str):
         super().__init__()
 
-        #configure the style of the treeview widget with a font that will work on raspberry pi
-        style = ttk.Style()
-        style.configure("Treeview", font=("DejaVu Sans Mono", 14), rowheight=32)
-
-
         #list of directories
         self.directories = []
         self.root_name = root
@@ -29,15 +24,15 @@ class TKFileBrowser(tk.Frame):
         self.tree.heading("#0", text=self.root_name, anchor=tk.W)
         root_node = self.tree.insert("", tk.END, text=self.root_name, open=True)
 
-        self.populate_tree(self.root_name, root_node, self.root_name)
+        self._populate_tree(self.root_name, root_node, self.root_name)
 
-        self.tree.bind("<Double-Button-1>", self.on_double_click)
-        #self.tree.bind("<Button-3>", self.on_right_click) 
+        self.tree.bind("<Double-Button-1>", self._on_double_click)
+        self.tree.bind("<Button-3>", self._on_right_click) 
 
     #populate the tree with the contents of a directory
-    def populate_tree(self, dir_name : str, dir_id : str, full_path : str = None):
+    def _populate_tree(self, dir_name : str, dir_id : str, full_path : str = None):
         #add the files and directories but ignore hidden ones
-        contents = [file for file in self.search_directory(full_path) if not file.startswith(".")]
+        contents = [file for file in self._search_directory(full_path) if not file.startswith(".")]
 
         #variable for storing the index of the node
         index = 0
@@ -56,7 +51,7 @@ class TKFileBrowser(tk.Frame):
 
             index += 1
 
-    def search_directory(self, dir : str):
+    def _search_directory(self, dir : str):
         #get the contents of the directory
         contents = os.listdir(dir)
         #sort the contents
@@ -77,7 +72,7 @@ class TKFileBrowser(tk.Frame):
 
             return self._get_full_path(parent_id, path)
 
-    def on_double_click(self, event):
+    def _on_double_click(self, event):
         #get the item that was clicked
         item_id = self.tree.selection()[0]
 
@@ -89,6 +84,52 @@ class TKFileBrowser(tk.Frame):
         #if the item is a directory, open it
         if (full_path in self.directories):
             #populate the directory
-            self.populate_tree(item_text, item_id, full_path)
+            self._populate_tree(item_text, item_id, full_path)
             #open the directory
-            self.tree.item(item_id, open=True)
+            self.tree.item(item_id, text=item_text, open=True)
+
+    def _on_right_click(self, event):
+        #get the item that was clicked
+        item_id = event.widget.identify_row(event.y)
+
+        #make the item selected
+        self.tree.selection_set(item_id)
+
+        #get the text of the item
+        item_text = self.tree.item(item_id, "text")
+        full_path = self._get_full_path(item_id, item_text)
+
+        #open a list of options and make it so that if the user mouses away from the menu, it closes
+        menu = tk.Menu(self, tearoff=0)
+        menu.add_command(label="Rename", command=lambda: self._rename(item_id, item_text, full_path))
+        menu.add_command(label="Delete", command=lambda: self._delete(item_id, full_path))
+        menu.add_command(label="Copy", command=lambda: self._copy(item_id, full_path))
+        menu.add_command(label="Cut", command=lambda: self._cut(item_id, full_path))
+        menu.add_command(label="Paste", command=lambda: self._paste(item_id, full_path))
+
+        #if the item is a directory, add the option to set it as the backup target
+        if (full_path in self.directories):
+            menu.add_command(label="Back up to this folder?", command=lambda: self._change_backup_folder(item_id, full_path))
+        
+        #display the menu
+        menu.post(event.x_root, event.y_root)
+        #close it if the user has moused away
+        menu.bind("<Leave>", lambda event: menu.destroy())
+
+    def _rename(self, item_id : str, item_text : str, full_path : str):
+        pass
+
+    def _delete(self, item_id : str, full_path : str):
+        pass
+
+    def _copy(self, item_id : str, full_path : str):
+        pass
+
+    def _cut(self, item_id : str, full_path : str):
+        pass
+
+    def _paste(self, item_id : str, full_path : str):
+        pass
+        
+    def _change_backup_folder(self, item_id : str, full_path : str):
+        pass

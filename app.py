@@ -1,12 +1,19 @@
 import tkinter as tk
+from tkinter import ttk
 from src.tk_filebrowser import TKFileBrowser
 
 #a very basic window that we will embed the file browser in
 class MainWindow(tk.Tk):
     def __init__(self, width : int, height : int):
         super().__init__()
-        self.title("Main Window")
+        self.title("Backup Boy")
         self.geometry(f"{width}x{height}")
+
+        #configure the style of the treeview widget with a font that will work on raspberry pi
+        self.call('source', 'resources/styles/forest-dark.tcl')
+        style = ttk.Style()
+        style.theme_use('forest-dark')
+        style.configure("Treeview", font=(14), rowheight=32)
 
         self.width=width
         self.height=height
@@ -39,6 +46,6 @@ class MainWindow(tk.Tk):
 
 if __name__ == "__main__":
     app = MainWindow(800, 600)
-    app.attributes("-fullscreen", True)
+    #app.attributes("-fullscreen", True)
 
     app.mainloop()
