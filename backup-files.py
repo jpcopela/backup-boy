@@ -16,7 +16,7 @@ console = Console(theme=success_theme)
 def main():
     #Run the connect_cameras.sh script
     console.print("Searching for cameras...", style="info")
-    camera_connect = subprocess.run(['bash', 'connect_cameras.sh'], capture_output=True, text=True, check=True)
+    camera_connect = subprocess.run(['bash', 'connect_cameras.sh'], capture_output=True, text=True)
     device_name = camera_connect.stdout.strip()
 
     cam_detected = Text(f"Camera detected: {device_name}")

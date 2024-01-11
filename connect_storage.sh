@@ -3,7 +3,7 @@
 #find connected USB mass storage devices
 MOUNTED_DRIVE=$(find /dev/disk/by-path/ -name "*usb*part*")
 
-while [ -z "$MOUNTED_DRIVE" ]; do
+while [ -z $MOUNTED_DRIVE ]; do
     sleep 1
     MOUNTED_DRIVE=$(find /dev/disk/by-path/ -name "*usb*part*")
 done

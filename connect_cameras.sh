@@ -5,7 +5,7 @@ CONNECTED=$(gphoto2 --auto-detect -q | grep 'usb:')
 
 while [ -n $CONNECTED ]; do
     sleep 1
-    CONNECTED=$(gphoto2 --auto-detect -q| grep 'usb:')
+    CONNECTED=$(gphoto2 --auto-detect -q | grep 'usb:')
 done
 
 DEVICE_KEY=$(gphoto2 --auto-detect -q)
