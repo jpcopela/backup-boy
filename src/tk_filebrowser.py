@@ -11,7 +11,7 @@ class TKFileBrowser(tk.Frame):
 
         #configure the style of the treeview widget with a font that will work on raspberry pi
         style = ttk.Style()
-        style.configure("Treeview", font=("TkDefaultFont", 14), rowheight=32)
+        style.configure("Treeview", font=("DejaVu Sans", 14), rowheight=32)
 
 
         #list of directories
