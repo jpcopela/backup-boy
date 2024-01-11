@@ -1,98 +1,44 @@
 import tkinter as tk
-from tkinter import ttk
+from src.tk_filebrowser import TKFileBrowser
 
-import os
-
-#Since tkinter filedialogs are derived from the OS,
-#they cannot be embedded in a tkinter window. I will therefore have to make my own tkinter-based file browser.
-#I will use the treeview widget to do this.
-
-
-class TKFileBrowser(tk.Tk):
-    def __init__(self, root : str, width : int, height : int):
+#a very basic window that we will embed the file browser in
+class MainWindow(tk.Tk):
+    def __init__(self, width : int, height : int):
         super().__init__()
-        self.title("File Browser")
+        self.title("Main Window")
         self.geometry(f"{width}x{height}")
-        self.resizable(False, False)
 
-        #list of directories
-        self.directories = []
-        self.root_name = root
-        self._initialize_tree()
+        self.width=width
+        self.height=height
 
-    def _initialize_tree(self):
-        self.tree = ttk.Treeview(self)
-        self.tree.pack(fill=tk.BOTH, expand=True)
+        self._init_ui()
 
-        self.tree.heading("#0", text=self.root_name, anchor=tk.W)
-        root_node = self.tree.insert("", tk.END, text=self.root_name, open=True)
+    def _init_ui(self):
+        #the first file browser will be on the left side of the window
+        self.left_file_browser = TKFileBrowser("/home/jackson")
+        self.left_file_browser.grid(row=1, column=1, sticky=tk.NSEW)
 
-        self.populate_tree(self.root_name, root_node, self.root_name)
+        #the second file browser will be on the right side of the window
+        self.right_file_browser = TKFileBrowser("/home/jackson")
+        self.right_file_browser.grid(row=1, column=2, sticky=tk.NSEW)
 
-        self.tree.bind("<Double-Button-1>", self.on_double_click)
-        #self.tree.bind("<Button-3>", self.on_right_click) 
+        #configure the grid
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=3)
+        self.grid_columnconfigure(2, weight=3)
+        self.grid_columnconfigure(3, weight=1)
 
-    def populate_tree(self, dir_name : str, dir_id : str, full_path : str = None):
-        #add the files and directories but ignore hidden ones
-        contents = [file for file in self.search_directory(full_path) if not file.startswith(".")]
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
-        #variable for storing the index of the node
-        index = 0
+        #make it exit when escape is pressed
+        self.bind("<Escape>", self.exit)
 
-        #add the contents to the tree
-        for item in contents:
-            item_id = self.tree.insert(dir_id, index, text=item)
-
-            #get the full path of the item
-            full_path = self._get_full_path(item_id, item)
-            #add the item to the tree
-            #if the item is a directory, log it
-            if os.path.isdir(full_path):
-                self.directories.append(full_path)
-
-            index += 1
-
-    def search_directory(self, dir : str):
-        #get the contents of the directory
-        contents = os.listdir(dir)
-        #sort the contents
-        contents.sort()
-
-        return contents
-    
-    #recursively get the parent of a given item
-    #if the item is the root, return it
-    def _get_full_path(self, item_id : str, initial_path : str):
-        parent_id = self.tree.parent(item_id)
-        parent_text = self.tree.item(parent_id, "text")
-
-        if (parent_id == ''):
-            return initial_path
-        else:
-            path = parent_text + '/' + initial_path
-
-            return self._get_full_path(parent_id, path)
-
-    def on_double_click(self, event):
-        #get the item that was clicked
-        item_id = self.tree.selection()[0]
-
-        #get the text of the item
-        item_text = self.tree.item(item_id, "text")
-
-        full_path = self._get_full_path(item_id, item_text)
-
-        #if the item is a directory, open it
-        if (full_path in self.directories):
-            #populate the directory
-            self.populate_tree(item_text, item_id, full_path)
-            #open the directory
-            self.tree.item(item_id, open=True)
+    def exit(self, event):
+        self.destroy()
 
 if __name__ == "__main__":
-    root = "/home/jackson"
-    width = 500
-    height = 500
+    app = MainWindow(800, 600)
+    app.attributes("-fullscreen", True)
 
-    app = TKFileBrowser(root, width, height)
     app.mainloop()
