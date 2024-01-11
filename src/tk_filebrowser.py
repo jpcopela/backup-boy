@@ -9,9 +9,10 @@ class TKFileBrowser(tk.Frame):
     def __init__(self, root : str):
         super().__init__()
 
-        #configure the style of the treeview widget
+        #configure the style of the treeview widget with a font that will work on raspberry pi
         style = ttk.Style()
-        style.configure("Treeview", font=("Ubuntu mono", 14), rowheight=32)
+        style.configure("Treeview", font=("TkDefaultFont", 14), rowheight=32)
+
 
         #list of directories
         self.directories = []
