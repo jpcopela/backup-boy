@@ -13,7 +13,7 @@ class MainWindow(tk.Tk):
         self.call('source', 'resources/styles/forest-dark.tcl')
         style = ttk.Style()
         style.theme_use('forest-dark')
-        style.configure("Treeview", font=(14), rowheight=32)
+        style.configure("Treeview", font=('DejaVu Sans', 24), rowheight=64)
 
         self.width=width
         self.height=height
@@ -22,11 +22,11 @@ class MainWindow(tk.Tk):
 
     def _init_ui(self):
         #the first file browser will be on the left side of the window
-        self.left_file_browser = TKFileBrowser("/home/jackson")
+        self.left_file_browser = TKFileBrowser("/home/jackson", autoscroll=True)
         self.left_file_browser.grid(row=1, column=1, sticky=tk.NSEW)
 
         #the second file browser will be on the right side of the window
-        self.right_file_browser = TKFileBrowser("/home/jackson")
+        self.right_file_browser = TKFileBrowser("/home/jackson", autoscroll=True)
         self.right_file_browser.grid(row=1, column=2, sticky=tk.NSEW)
 
         #configure the grid
