@@ -9,8 +9,13 @@ import time
 #Since tkinter filedialogs are derived from the OS, they cannot be embedded in a tkinter window. 
 #I will therefore have to make my own tkinter-based file browser using a treeview widget.
 class TKFileBrowser(tk.Frame):
-    def __init__(self, root : str, autoscroll : bool = False):
-        super().__init__()
+    def __init__(self, master, root : str, autoscroll : bool = False):
+        super().__init__(master)
+
+        style = master.style
+        style.configure("Treeview", font=master.file_browser_font, rowheight=64)
+        #create lines between the items
+        style.configure("Treeview", indent=0)
 
         #list of directories
         self.directories = []
@@ -22,13 +27,13 @@ class TKFileBrowser(tk.Frame):
 
     #initialize the treeview widget and populate the root directory
     def _initialize_tree(self):
-        self.tree = ttk.Treeview(self)
+        self.tree = ttk.Treeview(self, show="tree", selectmode="browse", height=4)
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-        #set it so only 6 items are visible at a time
-        #self.tree.configure(height=6)
-
-        self.folder_icon = tk.PhotoImage(file="resources/icons/empty_folder_large.png")
+        self.empty_folder_icon = tk.PhotoImage(file="/home/jackson/backup-boy/resources/icons/empty_folder.png")
+        self.full_folder_icon = tk.PhotoImage(file="/home/jackson/backup-boy/resources/icons/full_folder.png")
+        self.photo_icon = tk.PhotoImage(file="/home/jackson/backup-boy/resources/icons/image_icon.png")
+        self.video_icon = tk.PhotoImage(file="/home/jackson/backup-boy/resources/icons/video_icon.png")
     
         #self.tree.heading("#0", text=self.root_name, anchor=tk.W)
         root_node = self.tree.insert("", tk.END, text=self.root_name, open=True)
@@ -66,10 +71,22 @@ class TKFileBrowser(tk.Frame):
             #get the full path of the item
             full_item_path = full_path + '/' + item
 
-            #if the item is a directory, log it
+            #if the item is a directory, log it and set its icon
             if os.path.isdir(full_item_path):
-                self.tree.item(item_id, image=self.folder_icon)
                 self.directories.append(full_item_path)
+
+                is_empty = len(os.listdir(full_item_path)) == 0
+
+                if (is_empty):
+                    self.tree.item(item_id, image=self.empty_folder_icon)
+                else:
+                    self.tree.item(item_id, image=self.full_folder_icon)
+
+            elif item.endswith((".png", ".jpg", ".jpeg", ".ARW", ".arw", ".tif", ".tiff", ".gif", ".bmp")):
+                self.tree.item(item_id, image=self.photo_icon)
+
+            elif item.endswith((".mp4", ".mov", ".avi", ".wmv", ".flv", ".mkv", ".webm", ".gifv")):
+                self.tree.item(item_id, image=self.video_icon)
 
             index += 1
 
@@ -115,8 +132,6 @@ class TKFileBrowser(tk.Frame):
             else:
                 self.tree.item(item_id, text=item_text, open=False)
 
-            print(self.tree.item(item_id, "open"))
-
             #get the children of the item
             children = self.tree.get_children(item_id)
 
@@ -141,6 +156,8 @@ class TKFileBrowser(tk.Frame):
 
         #open a list of options and make it so that if the user mouses away from the menu, it closes
         menu = tk.Menu(self, tearoff=0)
+        menu.configure(font=self.master.file_browser_font)
+
         menu.add_command(label="Rename", command=lambda: self._rename(item_id, full_path))
         menu.add_command(label="Delete", command=lambda: self._delete(item_id, full_path))
         menu.add_command(label="Copy", command=lambda: self._copy(item_id, full_path))
